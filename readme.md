@@ -1,6 +1,8 @@
 # Collaborative Note-taking App with TextSync
 This is a demo on how to create a collaborative note-taking application using TextSync and JavaScript.
 
+![](https://www.dropbox.com/s/k95vfcmj0q90acb/Collaborative-Note-taking-Application-Javascript.gif?raw=1)
+
 ### Requirements
 * Basic JavaScript knowledge (Node.js).
 * Node.js and NPM installed on your machine.
