@@ -1,7 +1,7 @@
 var collaborators = [];
 
 const initTextSync = function () {
-    const textSync = new TextSync({ instanceLocator: "v1:us1:3ca672fc-0717-49a2-abb0-81677680b654" });
+    const textSync = new TextSync({ instanceLocator: "INSTANCE_LOCATOR" });
 
     return textSync.createEditor({
         // @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
