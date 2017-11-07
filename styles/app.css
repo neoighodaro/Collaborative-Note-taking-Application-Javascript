@@ -1,0 +1,61 @@
+.navbar .navbar-brand {
+    margin: 0;
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+.navbar .navbar-brand > .title {
+    display: block;
+    font-size: 16px;
+    color: #1b2733;
+    font-weight: 600;
+    line-height: 22px;
+    margin-bottom: 5px;
+}
+.navbar .navbar-brand > .commentary {
+    display: block;
+    font-size: 12px;
+    color: #707e8d;
+}
+
+/* Override the style of the editor */
+#editor .ql-toolbar {
+    width: auto;
+    float: left;
+    border-radius: 5px;
+    position: relative;
+    top: 7px;
+    background: #f4f4f4;
+    border: none;
+    position: fixed;
+    margin-top: 67px;
+    z-index: 99999;
+    opacity: .3;
+    transition: opacity .3s ease;
+}
+#editor .ql-toolbar:hover {
+    opacity: 1;
+}
+#editor .tsync-presence-container {
+    float: right;
+    position: sticky;
+    top: 67px;
+    /* opacity: .5; */
+    z-index: 9999;
+    transition: opacity .3s ease;
+}
+#editor .tsync-presence-container:hover {
+    opacity: 1;
+}
+
+#tsync-editor {
+    clear: both;
+    border: none;
+    padding-top: 50px;
+}
+#tsync-editor > .ql-editor {
+    font-size: 18px;
+    color: #444;
+    line-height: 1.4;
+    font-family: 'Source sans pro', 'Helvetica Neue', sans-serif;
+}
