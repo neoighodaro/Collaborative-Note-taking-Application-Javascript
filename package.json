@@ -3,18 +3,11 @@
   "version": "1.0.0",
   "description": "Collaborative note taking application built with NodeJS and TextSync.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "textsync",
-    "notes",
-    "realtime",
-    "collaborative"
-  ],
-  "author": "Neo Ighodaro <neo@creativitykils.co>",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.16.0",
+    "sqlite": "^2.8.0"
   }
 }
