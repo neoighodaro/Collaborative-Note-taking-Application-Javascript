@@ -1,3 +1,2 @@
-*
-!/migrations
-!.gitignore
+database.sqlite
+
