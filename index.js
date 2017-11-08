@@ -1,17 +1,31 @@
+// ------------------------------------------------------
+// Import Node Modules...
+// ------------------------------------------------------
+
 const express    = require('express')
 const bodyParser = require('body-parser');
 const Promise    = require('bluebird');
 const db         = require('sqlite');
 
+// ------------------------------------------------------
+// Create the Express app
+// ------------------------------------------------------
+
 const app        = express()
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(__dirname + '/scripts'))
-app.use(express.static(__dirname + '/styles'))
 
 // ------------------------------------------------------
-// Define Routes: API
+// Load the middlewares
+// ------------------------------------------------------
+
+app.use(bodyParser.json());
+app.use(express.static(__dirname + '/styles'))
+app.use(express.static(__dirname + '/scripts'))
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
+// ------------------------------------------------------
+// Helper function(s)
 // ------------------------------------------------------
 
 function slugify(text) {
@@ -22,6 +36,11 @@ function slugify(text) {
                .replace(/^-+/, '')
                .replace(/-+$/, '')
 }
+
+
+// ------------------------------------------------------
+// API Routes
+// ------------------------------------------------------
 
 app.get('/api/notes/:slug', (req, res, next) => {
     try {
@@ -34,28 +53,29 @@ app.get('/api/notes/:slug', (req, res, next) => {
     }
 })
 
+app.get('/api/notes', (req, res, next) => {
+    try {
+        db.all('SELECT * FROM Notes').then(row => res.json({
+            data: (row ? row : [])
+        }))
+    } catch (err) {
+      next(err);
+    }
+})
+
 app.post('/api/notes', (req, res, next) => {
     try {
         const title = req.body.title
         const slug  = slugify(title).substr(0, 32)
 
-        db.run('INSERT INTO Notes (Slug,Title) VALUES (?,?)', slug, title).then( query => {
+        db.run('INSERT INTO Notes (Slug,Title) VALUES (?,?)', slug, title).then(query => {
             db.get('SELECT * FROM Notes WHERE ID = ?', query.stmt.lastID)
-              .then(row => res.json({data:row}))
+                .then(row => res.json({
+                    data: (row ? row : [])
+                }))
         }).catch(e => res.json(e))
     } catch (err) {
         next(err)
-    }
-})
-
-app.get('/api/notes', (req, res, next) => {
-    try {
-        db.all('SELECT * FROM Notes').then(row => {
-            row = row ? row : []
-            res.json({data:row})
-        })
-    } catch (err) {
-      next(err);
     }
 })
 
