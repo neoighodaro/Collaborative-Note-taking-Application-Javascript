@@ -12,4 +12,5 @@ This is a demo on how to create a collaborative note-taking application using Te
 * Clone/download the project to your machine.
 * Open `./scripts/app.js` and replace the `INSTANCE_LOCATOR` with the one in your TextSync dashboard.
 * Run `npm install` in the directory of the project.
+* Create a `database.sqlite` file in the `database` directory.
 * Run `node index.js` to start the Node express application.
