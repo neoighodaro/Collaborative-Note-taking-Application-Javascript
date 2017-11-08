@@ -1,8 +1,9 @@
-const express  = require('express')
-const app      = express()
-let bodyParser = require('body-parser');
-let Promise    = require('bluebird');
-let db         = require('sqlite');
+const express    = require('express')
+const bodyParser = require('body-parser');
+const Promise    = require('bluebird');
+const db         = require('sqlite');
+
+const app        = express()
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -12,6 +13,15 @@ app.use(express.static(__dirname + '/styles'))
 // ------------------------------------------------------
 // Define Routes: API
 // ------------------------------------------------------
+
+function slugify(text) {
+    return text.toString().toLowerCase().trim()
+               .replace(/\s+/g, '-')
+               .replace(/[^\w\-]+/g, '')
+               .replace(/\-\-+/g, '-')
+               .replace(/^-+/, '')
+               .replace(/-+$/, '')
+}
 
 app.get('/api/notes/:slug', (req, res, next) => {
     try {
@@ -26,7 +36,10 @@ app.get('/api/notes/:slug', (req, res, next) => {
 
 app.post('/api/notes', (req, res, next) => {
     try {
-        db.run('insert into Notes (Slug) values (?)', req.query.slug).then( query => {
+        const title = req.body.title
+        const slug  = slugify(title).substr(0, 32)
+
+        db.run('INSERT INTO Notes (Slug,Title) VALUES (?,?)', slug, title).then( query => {
             db.get('SELECT * FROM Notes WHERE ID = ?', query.stmt.lastID)
               .then(row => res.json({data:row}))
         }).catch(e => res.json(e))
@@ -72,6 +85,6 @@ app.use((req, res, next) => {
 
 Promise.resolve()
     .then(()    => db.open('./database/database.sqlite', { Promise }))
-    .then(()    => db.migrate({ /*force: 'last',*/ migrationsPath: './database/migrations' }))
+    .then(()    => db.migrate({ force: 'last', migrationsPath: './database/migrations' }))
     .catch(err  => console.error(err.stack))
     .finally(() => app.listen(3000, () => console.log('App listening on port 3000!')));

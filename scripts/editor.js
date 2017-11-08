@@ -10,7 +10,8 @@ axios.get('/api/notes/'+slug).then(function (response) {
 
     let collaborators = []
 
-    $('span.title').text(note.Slug)
+    $('title').text(note.Title)
+    $('span.title').text(note.Title)
 
     const textSync = new TextSync({ instanceLocator: "v1:us1:3ca672fc-0717-49a2-abb0-81677680b654" });
 

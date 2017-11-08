@@ -1,5 +1,7 @@
 .navbar .navbar-brand {
     margin: 0;
+}
+.navbar .navbar-brand.wide {
     width: 100%;
     display: block;
     text-align: center;
