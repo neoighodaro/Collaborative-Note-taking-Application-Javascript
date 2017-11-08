@@ -20,7 +20,6 @@ const app        = express()
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/styles'))
-app.use(express.static(__dirname + '/scripts'))
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
