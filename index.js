@@ -2,10 +2,10 @@
 // Import Node Modules...
 // ------------------------------------------------------
 
+const db         = require('sqlite')
 const express    = require('express')
-const bodyParser = require('body-parser');
-const Promise    = require('bluebird');
-const db         = require('sqlite');
+const Promise    = require('bluebird')
+const bodyParser = require('body-parser')
 
 // ------------------------------------------------------
 // Create the Express app
