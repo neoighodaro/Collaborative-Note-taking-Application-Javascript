@@ -11,7 +11,7 @@ const bodyParser = require('body-parser')
 // Create the Express app
 // ------------------------------------------------------
 
-const app        = express()
+const app = express()
 
 
 // ------------------------------------------------------
