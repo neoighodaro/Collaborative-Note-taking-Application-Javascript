@@ -24,9 +24,9 @@
     <script src="//cdn.jsdelivr.net/combine/npm/jquery@3.2.1,npm/axios@0.17.0/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/pusher/deliverfoo/us1/textsync.js"></script>
     <script type="text/javascript">
-        const slug = document.URL.substr(document.URL.lastIndexOf('/') + 1)
+        const ID = document.URL.substr(document.URL.lastIndexOf('/') + 1)
 
-        axios.get('/api/notes/'+slug).then(function (response) {
+        axios.get('/api/notes/'+ID).then(function (response) {
             const note = response.data.data
 
             // Could not find that note, redirect to home

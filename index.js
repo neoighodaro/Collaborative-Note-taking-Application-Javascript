@@ -36,14 +36,25 @@ function slugify(text) {
                .replace(/-+$/, '')
 }
 
+function randomString(count) {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (let i = 0; i < count; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+}
+
 
 // ------------------------------------------------------
 // API Routes
 // ------------------------------------------------------
 
-app.get('/api/notes/:slug', (req, res, next) => {
+app.get('/api/notes/:id', (req, res, next) => {
     try {
-        db.get('SELECT * FROM Notes WHERE Slug = ?', req.params.slug).then(row => {
+        db.get('SELECT * FROM Notes WHERE ID = ?', req.params.id).then(row => {
             row = row ? row : {}
             res.json({data:row})
         })
@@ -64,10 +75,9 @@ app.get('/api/notes', (req, res, next) => {
 
 app.post('/api/notes', (req, res, next) => {
     try {
-        const title = req.body.title
-        const slug  = slugify(title).substr(0, 32)
+        const title = randomString(32)
 
-        db.run('INSERT INTO Notes (Slug,Title) VALUES (?,?)', slug, title).then(query => {
+        db.run('INSERT INTO Notes (Slug, Title) VALUES (?,?)', title, "Untitled Note").then(query => {
             db.get('SELECT * FROM Notes WHERE ID = ?', query.stmt.lastID)
                 .then(row => res.json({
                     data: (row ? row : [])

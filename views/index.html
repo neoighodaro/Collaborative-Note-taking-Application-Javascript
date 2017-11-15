@@ -15,21 +15,7 @@
     </nav>
 
     <div class="container" style="margin-top: 50px">
-        <a href="#" class="btn btn-primary btn-sm" role="button" data-toggle="modal" data-target="#addNoteModal">Create New Note</a>
-        <div class="modal fade" id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="addNoteModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <input class="form-control" type="text" id="note_name" name="name" placeholder="Title of the Note..."/>
-                            </div>
-                            <button type="submit" id="create_note" class="btn btn-primary btn-block">Create Note</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <a href="#" class="btn btn-primary btn-sm" id="create-btn">Create New Note</a>
         <hr>
         <div class="card">
             <div class="list-group list-group-flush">
@@ -38,31 +24,41 @@
     </div>
 
     <script src="//cdn.jsdelivr.net/combine/npm/jquery@3.2.1,npm/axios@0.17.0/dist/axios.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-    $('form').on('submit', function (e) {
-        e.preventDefault()
-        const title = $('#note_name').val()
-        axios.post('/api/notes', {title}).then(response => {
-            const note = response.data.data
-            if (note.ID) {
-                return (window.location = '/notes/'+note.Slug)
+        const noteDocument = $(document)
+        const createButton = $('#create-btn')
+        const notesList    = $('.list-group.list-group-flush')
+
+        const helpers = {
+            /**
+             * On click, create a new note and redirect to it...
+             */
+            createNoteAndRedirect: evt => {
+                axios.post('/api/notes').then(response => (window.location = '/notes/'+response.data.data.ID))
+            },
+
+            /**
+             * Load the notes to the page...
+             */
+            loadNotes: evt => {
+                axios.get('/api/notes').then(response => {
+                    const notes = response.data.data
+
+                    for (var index = 0; index < notes.length; index++) {
+                        notesList.append(
+                            `<a href="/notes/${notes[index].ID}" class="list-group-item list-group-item-action">
+                                ${notes[index].Title}
+                            </a>`
+                        )
+                    }
+                })
             }
-        })
-    })
-
-    axios.get('/api/notes').then(function (response) {
-        let html = ""
-        var notes = response.data.data
-
-        for (var index = 0; index < notes.length; index++) {
-            var note = notes[index];
-            html += '<a href="/notes/'+note.Slug+'" class="list-group-item list-group-item-action">'+note.Title+'</a>'
         }
 
-        $('.list-group.list-group-flush').html(html)
-    })
+        noteDocument.ready(helpers.loadNotes)
+        createButton.click(helpers.createNoteAndRedirect)
     </script>
 </body>
 </html>
