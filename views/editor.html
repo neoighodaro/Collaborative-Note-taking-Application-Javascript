@@ -21,8 +21,9 @@
         <div id="editor"></div>
     </div>
 
-    <script src="//cdn.jsdelivr.net/combine/npm/jquery@3.2.1,npm/axios@0.17.0/dist/axios.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/combine/npm/jquery@3.2.1,npm/axios@0.17.0/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/pusher/deliverfoo/us1/textsync.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
     <script type="text/javascript">
         const noteDocument = $(document)
         const collaboratorsText = $('.navbar-brand .commentary')
@@ -32,6 +33,7 @@
             title: null,
             collaborators: [],
             textSync: undefined,
+            currentNote: undefined,
         }
 
         const helpers = {
@@ -41,19 +43,35 @@
             loadNoteEditors: () => {
                 const noteID = document.URL.substr(document.URL.lastIndexOf('/') + 1)
 
-                axios.get(`/api/notes/${noteID}`).then(response => {
-                    const currentNote = response.data.data
+                axios.get(`/api/notes/${noteID}`)
+                    .then(response => {
+                        note.currentNote = response.data.data
 
-                    if (currentNote.ID === undefined) {
-                        return (window.location = '/');
-                    }
+                        if (note.currentNote.ID === undefined) {
+                            return (window.location = '/');
+                        }
 
-                    $('title').text(note.Title)
+                        $('title').text(note.Title)
 
-                    note.textSync = new TextSync({ instanceLocator: PUSHER_INSTANCE_LOCATOR });
-                    helpers.createContentTextEditor(note.textSync)
-                    helpers.createTitleTextEditor(currentNote.Title, note.textSync)
-                })
+                        note.textSync = new TextSync({ instanceLocator: PUSHER_INSTANCE_LOCATOR });
+                        helpers.createTitleTextEditor()
+                        helpers.createContentTextEditor()
+                    })
+                    .then(() => {
+                        setTimeout(() => {
+                            document.querySelector("#titleEditor .ql-editor")
+                                    .addEventListener("input", _.debounce(helpers.updateNoteTitle, 1000));
+                        }, 3000)
+                    })
+            },
+
+            /**
+             * Update the title of the note.
+             */
+            updateNoteTitle: () => {
+                const title = $('#titleEditor .ql-editor').text()
+
+                axios.put(`/api/notes/${note.currentNote.ID}`, {title})
             },
 
             /**
@@ -61,13 +79,13 @@
             *
             * @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
             */
-            createTitleTextEditor: (title, textSync) => {
-                textSync.createEditor({
+            createTitleTextEditor: () => {
+                note.textSync.createEditor({
                     element: '#titleEditor',
-                    docId: `${note.Slug}-title`,
+                    docId: `${note.currentNote.Slug}-title`,
                     richText: false,
-                    defaultText: title,
                     collaboratorBadges: false,
+                    defaultText: note.currentNote.Title,
                 })
             },
 
@@ -76,10 +94,10 @@
              *
              * @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
              */
-            createContentTextEditor: textSync => {
-                textSync.createEditor({
+            createContentTextEditor: () => {
+                note.textSync.createEditor({
                     element: "#editor",
-                    docId: `${note.Slug}-content`,
+                    docId: `${note.currentNote.Slug}-content`,
                     onCollaboratorsJoined: users => {
                         for (const key in users) {
                             note.collaborators[users[key].siteId] = users[key]

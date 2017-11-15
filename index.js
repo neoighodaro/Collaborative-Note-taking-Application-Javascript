@@ -75,7 +75,7 @@ app.get('/api/notes', (req, res, next) => {
 
 app.post('/api/notes', (req, res, next) => {
     try {
-        const title = randomString(32)
+        const title = randomString(24)
 
         db.run('INSERT INTO Notes (Slug, Title) VALUES (?,?)', title, "Untitled Note").then(query => {
             db.get('SELECT * FROM Notes WHERE ID = ?', query.stmt.lastID)
@@ -83,6 +83,15 @@ app.post('/api/notes', (req, res, next) => {
                     data: (row ? row : [])
                 }))
         }).catch(e => res.json(e))
+    } catch (err) {
+        next(err)
+    }
+})
+
+app.put('/api/notes/:id', (req, res, next) => {
+    try {
+        db.run("UPDATE Notes SET Title = ? WHERE ID = ?", req.body.title, req.params.id)
+          .then(query => res.json({status:"ok"}))
     } catch (err) {
         next(err)
     }
