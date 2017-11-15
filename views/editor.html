@@ -8,7 +8,7 @@
     <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
         <div class="container">
             <span class="navbar-brand">
-                <span class="title">Loading...</span>
+                <span class="title" id="titleEditor"></span>
                 <span class="commentary">Loading...</span>
             </span>
             <div class="back-home">
@@ -17,46 +17,82 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container text-editor">
         <div id="editor"></div>
     </div>
 
     <script src="//cdn.jsdelivr.net/combine/npm/jquery@3.2.1,npm/axios@0.17.0/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/pusher/deliverfoo/us1/textsync.js"></script>
     <script type="text/javascript">
-        const ID = document.URL.substr(document.URL.lastIndexOf('/') + 1)
+        const noteDocument = $(document)
+        const collaboratorsText = $('.navbar-brand .commentary')
+        const PUSHER_INSTANCE_LOCATOR = "v1:us1:3ca672fc-0717-49a2-abb0-81677680b654"
 
-        axios.get('/api/notes/'+ID).then(function (response) {
-            const note = response.data.data
+        let note = {
+            title: null,
+            collaborators: [],
+            textSync: undefined,
+        }
 
-            // Could not find that note, redirect to home
-            if ( ! note.ID) {
-                return (window.location = '/')
-            }
+        const helpers = {
+            /**
+             * Load the note editors.
+             */
+            loadNoteEditors: () => {
+                const noteID = document.URL.substr(document.URL.lastIndexOf('/') + 1)
 
-            let collaborators = []
+                axios.get(`/api/notes/${noteID}`).then(response => {
+                    const currentNote = response.data.data
 
-            $('title').text(note.Title)
-            $('span.title').text(note.Title)
-
-            const textSync = new TextSync({ instanceLocator: "v1:us1:3ca672fc-0717-49a2-abb0-81677680b654" });
-
-            textSync.createEditor({
-                // @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
-                element: "#editor",
-                docId: note.Slug,
-                onCollaboratorsJoined: function (users) {
-                    for (const key in users) {
-                        collaborators[users[key].siteId] = users[key]
+                    if (currentNote.ID === undefined) {
+                        return (window.location = '/');
                     }
 
-                    const count   = Object.keys(collaborators).length
-                    const message = count > 1 ? `${count} people are collaborating on this note.` : 'You are working alone, invite more people.'
+                    $('title').text(note.Title)
 
-                    $('.navbar-brand .commentary').text(message)
-                }
-            })
-        })
+                    note.textSync = new TextSync({ instanceLocator: PUSHER_INSTANCE_LOCATOR });
+                    helpers.createContentTextEditor(note.textSync)
+                    helpers.createTitleTextEditor(currentNote.Title, note.textSync)
+                })
+            },
+
+            /**
+            * Create the text editor for the main content.
+            *
+            * @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
+            */
+            createTitleTextEditor: (title, textSync) => {
+                textSync.createEditor({
+                    element: '#titleEditor',
+                    docId: `${note.Slug}-title`,
+                    richText: false,
+                    defaultText: title,
+                    collaboratorBadges: false,
+                })
+            },
+
+            /**
+             * Create the text editor for the main content.
+             *
+             * @see https://docs.pusher.com/textsync/reference/js#editor-config-properties
+             */
+            createContentTextEditor: textSync => {
+                textSync.createEditor({
+                    element: "#editor",
+                    docId: `${note.Slug}-content`,
+                    onCollaboratorsJoined: users => {
+                        for (const key in users) {
+                            note.collaborators[users[key].siteId] = users[key]
+                        }
+
+                        const count   = Object.keys(note.collaborators).length
+                        collaboratorsText.text((count > 1 ? `${count} collaborators.` : 'You are alone 😢'))
+                    }
+                })
+            },
+        }
+
+        noteDocument.ready(helpers.loadNoteEditors)
     </script>
 </body>
 </html>
