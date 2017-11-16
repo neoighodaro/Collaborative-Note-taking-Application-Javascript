@@ -19,7 +19,7 @@ const app = express()
 // ------------------------------------------------------
 
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/styles'))
+app.use(express.static(__dirname + '/assets'))
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
@@ -104,18 +104,6 @@ app.put('/api/notes/:id', (req, res, next) => {
 
 app.get('/notes/:slug', (req, res) => res.sendFile(__dirname + '/views/editor.html'))
 app.get('/', (req, res) => res.sendFile(__dirname + '/views/index.html'))
-
-
-// ------------------------------------------------------
-// Catch errors
-// ------------------------------------------------------
-
-app.use((req, res, next) => {
-    let err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
 
 // ------------------------------------------------------
 // Start application
