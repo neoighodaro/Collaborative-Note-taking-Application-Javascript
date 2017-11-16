@@ -41,7 +41,7 @@
 .text-editor .tsync-presence-container {
     float: right;
     position: sticky;
-    top: 87px;
+    /* top: 87px; */
     z-index: 9999;
     transition: opacity .3s ease;
 }
@@ -71,6 +71,9 @@
 .title #tsync-editor .ql-editor {
     padding: 0;
     font-size: 18px;
+}
+#titleEditor {
+    max-height: 30px;
 }
 
 footer {
