@@ -12,7 +12,7 @@ const bodyParser = require('body-parser')
 // ------------------------------------------------------
 
 const app = express()
-
+let data = {}
 
 // ------------------------------------------------------
 // Load the middlewares
@@ -52,48 +52,28 @@ function randomString(count) {
 // API Routes
 // ------------------------------------------------------
 
-app.get('/api/notes/:id', (req, res, next) => {
-    try {
-        db.get('SELECT * FROM Notes WHERE ID = ?', req.params.id).then(row => {
-            row = row ? row : {}
-            res.json({data:row})
-        })
-    } catch (err) {
-        next(err)
+app.get('/api/notes/:slug', (req, res, next) => {
+    if (data[req.params.slug] === undefined) {
+        res.status(404).json({status: 'error'})
+    } else {
+        res.json({data:data[req.params.slug]})
     }
 })
 
-app.get('/api/notes', (req, res, next) => {
-    try {
-        db.all('SELECT * FROM Notes').then(row => res.json({
-            data: (row ? row : [])
-        }))
-    } catch (err) {
-      next(err);
-    }
-})
+app.get('/api/notes', (req, res, next) => res.json({data}))
 
 app.post('/api/notes', (req, res, next) => {
-    try {
-        const title = randomString(24)
+    const title = randomString(24)
 
-        db.run('INSERT INTO Notes (Slug, Title) VALUES (?,?)', title, "Untitled Note").then(query => {
-            db.get('SELECT * FROM Notes WHERE ID = ?', query.stmt.lastID)
-                .then(row => res.json({
-                    data: (row ? row : [])
-                }))
-        }).catch(e => res.json(e))
-    } catch (err) {
-        next(err)
-    }
+    res.json({data: data[title] = {Slug: title, Title: "Untitled Note"}})
 })
 
-app.put('/api/notes/:id', (req, res, next) => {
-    try {
-        db.run("UPDATE Notes SET Title = ? WHERE ID = ?", req.body.title, req.params.id)
-          .then(query => res.json({status:"ok"}))
-    } catch (err) {
-        next(err)
+app.put('/api/notes/:slug', (req, res, next) => {
+    if (data[req.params.slug] === undefined) {
+        res.status(404).json({status: 'error'})
+    } else {
+        data[req.params.slug]["Title"] = req.body.title
+        res.json({status: "ok"})
     }
 })
 
@@ -109,8 +89,4 @@ app.get('/', (req, res) => res.sendFile(__dirname + '/views/index.html'))
 // Start application
 // ------------------------------------------------------
 
-Promise.resolve()
-    .then(()    => db.open('./database/database.sqlite', { Promise }))
-    .then(()    => db.migrate({ force: 'last', migrationsPath: './database/migrations' }))
-    .catch(err  => console.error(err.stack))
-    .finally(() => app.listen(3000, () => console.log('App listening on port 3000!')));
+app.listen(3000, () => console.log('App listening on port 3000!'))

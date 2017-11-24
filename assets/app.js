@@ -9,7 +9,7 @@
          * On click, create a new note and redirect to it...
          */
         createNoteAndRedirect: evt => {
-            axios.post('/api/notes').then(response => (window.location = '/notes/'+response.data.data.ID))
+            axios.post('/api/notes').then(response => (window.location = '/notes/'+response.data.data.Slug))
         },
 
         /**
@@ -19,12 +19,14 @@
             axios.get('/api/notes').then(response => {
                 const notes = response.data.data
 
-                for (var index = 0; index < notes.length; index++) {
-                    notesList.append(
-                        `<a href="/notes/${notes[index].ID}" class="list-group-item list-group-item-action">
-                            ${notes[index].Title}
-                        </a>`
-                    )
+                for (const key in notes) {
+                    if (notes.hasOwnProperty(key)) {
+                        notesList.append(
+                            `<a href="/notes/${notes[key].Slug}" class="list-group-item list-group-item-action">
+                                ${notes[key].Title}
+                            </a>`
+                        )
+                    }
                 }
             })
         }

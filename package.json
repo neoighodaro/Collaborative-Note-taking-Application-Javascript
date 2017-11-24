@@ -6,8 +6,6 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.2",
-    "bluebird": "^3.5.0",
-    "body-parser": "^1.16.0",
-    "sqlite": "^2.8.0"
+    "body-parser": "^1.16.0"
   }
 }

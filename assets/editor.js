@@ -16,15 +16,11 @@
          * Load the note editors.
          */
         loadNoteEditors: () => {
-            const noteID = document.URL.substr(document.URL.lastIndexOf('/') + 1)
+            const noteSlug = document.URL.substr(document.URL.lastIndexOf('/') + 1)
 
-            axios.get(`/api/notes/${noteID}`)
+            axios.get(`/api/notes/${noteSlug}`)
                 .then(response => {
                     note.currentNote = response.data.data
-
-                    if (note.currentNote.ID === undefined) {
-                        return (window.location = '/');
-                    }
 
                     $('title').text(note.Title)
 
@@ -38,6 +34,7 @@
                                 .addEventListener("input", _.debounce(helpers.updateNoteTitle, 1000));
                     }, 3000)
                 })
+                .catch(err => window.location = '/')
         },
 
         /**
@@ -46,7 +43,7 @@
         updateNoteTitle: () => {
             const title = $('#titleEditor .ql-editor').text()
 
-            axios.put(`/api/notes/${note.currentNote.ID}`, {title})
+            axios.put(`/api/notes/${note.currentNote.Slug}`, {title})
         },
 
         /**
@@ -78,7 +75,7 @@
                         note.collaborators[users[key].siteId] = users[key]
                     }
 
-                    const count   = Object.keys(note.collaborators).length
+                    const count = Object.keys(note.collaborators).length
                     collaboratorsText.text((count > 1 ? `${count} collaborators.` : 'You are alone 😢'))
                 }
             })
